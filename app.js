@@ -7,6 +7,8 @@ const cookieParser = require("cookie-parser");
 const errorHandler = require("./controllers/errorController");
 const { initSocket } = require("./util/socketService");
 const getSpotifyToken = require("./util/getSpotifyToken");
+const credentials = require("./credentials.json");
+console.log(credentials);
 require("dotenv").config();
 
 const app = express();

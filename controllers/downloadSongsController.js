@@ -112,7 +112,7 @@ const downloadSongsbyId = async (req, res, next) => {
   }
   try {
     io.to(socketId).emit("downloadSequenceCompleted");
-    await deleteDriveFolder(response.data.id, drive);
+    deleteDriveFolder(response.data.id, drive);
     fs.rm(path.join(process.cwd(), `temp/${sessionId}`), err => {});
     res.status(201).json({
       link: `https://drive.google.com/drive/folders/${response.data.id}`,
