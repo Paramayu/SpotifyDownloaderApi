@@ -17,6 +17,7 @@
     "express": "^5.1.0",
     "googleapis": "^164.1.0",
     "request": "^2.88.2",
+    "socket.io": "^4.8.1",
     "youtube-dl-exec": "^3.0.26",
     "youtube-search-api": "^2.0.1",
     "youtubei.js": "^16.0.1"

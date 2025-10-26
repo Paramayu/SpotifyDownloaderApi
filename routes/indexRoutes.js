@@ -2,8 +2,8 @@ const express = require("express");
 const {
   getSongById,
   getSongsByPlaylistId,
-} = require("../controllers/getSongs");
-const { downloadSongsbyId } = require("../controllers/downloadSongs");
+} = require("../controllers/getSongsController");
+const { downloadSongsbyId } = require("../controllers/downloadSongsController");
 const Router = express.Router();
 
 Router.get("/song/:id", getSongById);

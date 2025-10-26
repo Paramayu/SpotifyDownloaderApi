@@ -5,6 +5,5 @@ module.exports = async (folderId, drive) => {
       requestBody: { trashed: true },
     });
     await drive.files.emptyTrash();
-    console.log("\nDeleted folder with ID:", folderId);
   }, 10 * 60 * 1000);
 };

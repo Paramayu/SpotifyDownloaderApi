@@ -1,7 +1,7 @@
 const HTTPError = require("./http-error");
 
 module.exports = async function () {
-  if (process.env.SPOTIFY_TOKEN_TIME - Date.now() < 55 * 60 * 1000) {
+  if (Date.now() - process.env.SPOTIFY_TOKEN_TIME < 50 * 60 * 1000) {
     return;
   }
   try {
@@ -28,7 +28,7 @@ module.exports = async function () {
     const data = await response.json();
     process.env.SPOTIFY_TOKEN = data.access_token;
     process.env.SPOTIFY_TOKEN_TIME = Date.now();
-    console.log("New Token Made");
+    console.log("New Spotify Token Recieved!");
   } catch (error) {
     console.error("Failed to get Spotify token:", error);
   }

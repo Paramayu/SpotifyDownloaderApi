@@ -6,15 +6,15 @@ const fs = require("fs");
 const { google } = require("googleapis");
 const { uploadWebM } = require("../util/uploadFile");
 const { refreshToken } = require("../util/refershToken");
-const credentials = require("../credentials/credentials.json");
+const credentials = require("../credentials.json");
 const deleteDriveFolder = require("../util/deleteDriveFolder");
+const { getIO } = require("../util/socketService");
 const { client_secret, client_id, redirect_uris } =
   credentials.installed || credentials.web;
 
 const seekAndDownload = async (name, sessionId, artist) => {
   let results;
   try {
-    console.log(`\nSearching for ${name} by ${artist} lyrics`);
     results = await youtubesearchapi.GetListByKeyword(
       `${name} by ${artist} lyrics`,
       false,
@@ -27,7 +27,6 @@ const seekAndDownload = async (name, sessionId, artist) => {
     }
   }
   try {
-    console.log(`Downloading ${name} by ${artist}`);
     await youtubedl(
       `https://www.youtube.com/watch?v=${results.items[0].id}`,
       {
@@ -45,6 +44,13 @@ const seekAndDownload = async (name, sessionId, artist) => {
 };
 
 const downloadSongsbyId = async (req, res, next) => {
+  let totalDownloaded = 0;
+  const socketId = req.query.socketId;
+  if (!socketId) {
+    return res.status(400).json({ error: "Socket ID is required" });
+  }
+  let io;
+
   let downloadedSong;
   const sessionId = Math.floor(Math.random() * 1000000000000).toString();
   const token = await refreshToken();
@@ -61,14 +67,17 @@ const downloadSongsbyId = async (req, res, next) => {
     parents: [process.env.GOOGLE_APP_FOLDER_ID], // This tells Drive it's a folder
   };
 
-  console.log(
-    `\n\nOperation ID: ${sessionId}\nCreating folder "${sessionId}"...`
-  );
+  console.log(`\n\nOperation Started with ID: ${sessionId}`);
   const response = await drive.files.create({
     requestBody: fileMetadata, // The folder information
     fields: "id", // What information to return
   });
-
+  try {
+    io = getIO();
+    io.to(socketId).emit("downloadSequenceStarted");
+  } catch (error) {
+    next(new HTTPError("Socket Connection Failed", 500, error));
+  }
   for (const song of req.body.tracks) {
     try {
       downloadedSong = await seekAndDownload(song.name, sessionId, song.artist);
@@ -85,23 +94,26 @@ const downloadSongsbyId = async (req, res, next) => {
 
       oAuth2Client.setCredentials(token);
 
-      console.log(`Uploading ${song.name}...`);
       await uploadWebM(filepath, oAuth2Client, response.data.id);
     } catch (error) {
       throw new HTTPError("Uploading Failed", 500, error);
     }
+    console.log(`Uploaded ${song.name} by ${song.artist}`);
     try {
       fs.unlinkSync(filepath);
-      console.log(`Deleted ${song.name}`);
     } catch (error) {
       throw new HTTPError("Deleting Failed", 500, error);
     }
+    totalDownloaded += 1;
+    io.to(socketId).emit("progress", {
+      totalDownloaded,
+      downloadedSong: song.name,
+    });
   }
   try {
+    io.to(socketId).emit("downloadSequenceCompleted");
     await deleteDriveFolder(response.data.id, drive);
-    fs.rm(path.join(process.cwd(), `temp/${sessionId}`), err => {
-      console.log("Deleted temp folder");
-    });
+    fs.rm(path.join(process.cwd(), `temp/${sessionId}`), err => {});
     res.status(201).json({
       link: `https://drive.google.com/drive/folders/${response.data.id}`,
     });
@@ -112,7 +124,7 @@ const downloadSongsbyId = async (req, res, next) => {
       500
     );
   } finally {
-    console.log("Operation Complete");
+    console.log("Operation Complete\n");
   }
 };
 

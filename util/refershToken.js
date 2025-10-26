@@ -6,9 +6,9 @@ const { google } = require("googleapis");
 const fs = require("fs");
 const path = require("path");
 
-const credentials = require("../credentials/credentials.json");
+const credentials = require("../credentials.json");
 // Load credentials and token
-const TOKEN_PATH = path.join(__dirname, "../credentials/token.json");
+const TOKEN_PATH = path.join(__dirname, "../token.json");
 
 // Minimum time before expiry to trigger refresh (30 minutes in milliseconds)
 const MIN_TIME_BEFORE_REFRESH = 30 * 60 * 1000; // 30 minutes

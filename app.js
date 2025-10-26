@@ -1,24 +1,27 @@
 const express = require("express");
+const { Server } = require("socket.io");
+const HTTP = require("http");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
-const indexRoutes = require("./routes/indexRoutes");
 const errorHandler = require("./controllers/errorController");
+const { initSocket } = require("./util/socketService");
+const getSpotifyToken = require("./util/getSpotifyToken");
 require("dotenv").config();
 
 const app = express();
-
+const server = HTTP.createServer(app);
+const io = initSocket(server);
 app.use(cors());
 app.use(bodyParser.json());
 app.use(cookieParser());
 
+const indexRoutes = require("./routes/indexRoutes");
 app.use("/api", indexRoutes);
 
 app.use(errorHandler);
 const port = process.env.PORT || 3000;
-app.listen(port, async () => {
+server.listen(port, async () => {
   console.log(`Server is running on port ${port}`);
-  //   (await getSpotifyToken())
-  //     ? console.log("Spotify token fetched: ", process.env.SPOTIFY_TOKEN)
-  //     : console.log("Spotify token fetching failed");
+  getSpotifyToken();
 });
