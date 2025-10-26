@@ -3,6 +3,7 @@ const getSpotifyToken = require("../util/getSpotifyToken");
 const HTTPError = require("../util/http-error");
 
 const getSongById = async (req, res, next) => {
+  console.log("Hit getSongsbyId");
   await getSpotifyToken();
   try {
     let options = {
@@ -51,6 +52,7 @@ const getSongById = async (req, res, next) => {
 };
 
 const getSongsByPlaylistId = async (req, res, next) => {
+  console.log("Hit getSongsByPlaylistId");
   await getSpotifyToken();
   try {
     let options = {
