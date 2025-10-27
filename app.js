@@ -8,6 +8,7 @@ const errorHandler = require("./controllers/errorController");
 const { initSocket } = require("./util/socketService");
 const getSpotifyToken = require("./util/getSpotifyToken");
 require("dotenv").config();
+console.log(process.env.PORT);
 const initializeCredentials = require("./util/initializeCredentials");
 initializeCredentials();
 
