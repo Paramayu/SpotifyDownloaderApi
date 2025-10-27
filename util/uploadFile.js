@@ -43,7 +43,6 @@ async function uploadWebM(
     });
 
     // Step 7: Success!
-    console.log("✓ Upload successful!");
 
     return response.data;
   } catch (error) {

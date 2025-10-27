@@ -6,7 +6,7 @@ const fs = require("fs");
 const { google } = require("googleapis");
 const { uploadWebM } = require("../util/uploadFile");
 const { refreshToken } = require("../util/refershToken");
-const credentials = require("../credentials.json");
+const credentials = require("../tmp/credentials.json");
 const deleteDriveFolder = require("../util/deleteDriveFolder");
 const { getIO } = require("../util/socketService");
 const { client_secret, client_id, redirect_uris } =
@@ -32,11 +32,11 @@ const seekAndDownload = async (name, sessionId, artist) => {
       {
         format: "bestaudio", // extract only audio
         audioQuality: "0", // 0 = best
-        output: `./temp/${sessionId}/${name} -${artist}.webm`,
+        output: `./tmp/${sessionId}/${name} -${artist}.webm`,
       },
       { useGlobalBinary: true }
     );
-    console.log(`Downloaded ${name} by ${artist}`);
+    console.log(`↓️ Downloaded ${name} by ${artist}`);
     return `${name} -${artist}.webm`;
   } catch (error) {
     throw new HTTPError("Downloading Failed", 500, error);
@@ -67,7 +67,7 @@ const downloadSongsbyId = async (req, res, next) => {
     parents: [process.env.GOOGLE_APP_FOLDER_ID], // This tells Drive it's a folder
   };
 
-  console.log(`\n\nOperation Started with ID: ${sessionId}`);
+  console.log(`\nOperation Started with ID: ${sessionId}\n`);
   const response = await drive.files.create({
     requestBody: fileMetadata, // The folder information
     fields: "id", // What information to return
@@ -86,7 +86,7 @@ const downloadSongsbyId = async (req, res, next) => {
     }
     const filepath = path.join(
       __dirname,
-      `../temp/${sessionId}/${downloadedSong}`
+      `../tmp/${sessionId}/${downloadedSong}`
     );
 
     try {
@@ -98,7 +98,7 @@ const downloadSongsbyId = async (req, res, next) => {
     } catch (error) {
       throw new HTTPError("Uploading Failed", 500, error);
     }
-    console.log(`Uploaded ${song.name} by ${song.artist}`);
+    console.log(`✓ Uploaded ${song.name} by ${song.artist}`);
     try {
       fs.unlinkSync(filepath);
     } catch (error) {
@@ -112,11 +112,11 @@ const downloadSongsbyId = async (req, res, next) => {
   }
   try {
     io.to(socketId).emit("downloadSequenceCompleted");
-    deleteDriveFolder(response.data.id, drive);
-    fs.rm(path.join(process.cwd(), `temp/${sessionId}`), err => {});
+    fs.rmdir(path.join(process.cwd(), `tmp/${sessionId}`), err => {});
     res.status(201).json({
       link: `https://drive.google.com/drive/folders/${response.data.id}`,
     });
+    await deleteDriveFolder(response.data.id, drive);
   } catch (err) {
     console.error("Something happened while deleting the folder:", err);
     throw new HTTPError(

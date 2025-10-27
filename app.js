@@ -20,6 +20,13 @@ app.use(cookieParser());
 
 const indexRoutes = require("./routes/indexRoutes");
 app.use("/api", indexRoutes);
+app.get("/ping", (req, res) => {
+  res.status(200).json({
+    status: 200,
+    message: "Server is running",
+    timestamp: new Date(),
+  });
+});
 
 app.use(errorHandler);
 const port = process.env.PORT || 3000;

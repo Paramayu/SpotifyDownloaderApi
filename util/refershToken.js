@@ -6,9 +6,9 @@ const { google } = require("googleapis");
 const fs = require("fs");
 const path = require("path");
 
-const credentials = require("../credentials.json");
+const credentials = require("../tmp/credentials.json");
 // Load credentials and token
-const TOKEN_PATH = path.join(__dirname, "../token.json");
+const TOKEN_PATH = path.join(__dirname, "../tmp/token.json");
 
 // Minimum time before expiry to trigger refresh (30 minutes in milliseconds)
 const MIN_TIME_BEFORE_REFRESH = 30 * 60 * 1000; // 30 minutes
@@ -80,10 +80,7 @@ async function refreshToken() {
       (newExpiryDate - now) / (1000 * 60 * 60)
     );
 
-    console.log(`\nNew Token Details:`);
-    console.log(`  Expires: ${newExpiryDate.toLocaleString()}`);
-    console.log(`  Valid for: ${newHoursUntilExpiry} hours`);
-    console.log(`\n✓ Token refresh successful!\n`);
+    console.log(`✓ Token refresh successful!\n`);
 
     return updatedToken;
   } catch (error) {
