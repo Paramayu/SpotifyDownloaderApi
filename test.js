@@ -2,6 +2,8 @@
 // const { google } = require("googleapis"); // Google's API library
 const fs = require("fs"); // File system (to read credentials.json)
 const path = require("path");
+const initializeCredentials = require("./util/initializeCredentials");
+require("dotenv").config();
 // const readline = require("readline"); // To read user input from terminal
 
 // const { refreshToken } = require("./util/refershToken");
@@ -159,3 +161,6 @@ const path = require("path");
 // //   );
 // // })();
 // // console.log(__dirname);
+
+console.log(JSON.parse(process.env.TOKEN));
+initializeCredentials();
