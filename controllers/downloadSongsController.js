@@ -33,6 +33,9 @@ const seekAndDownload = async (name, sessionId, artist) => {
         format: "bestaudio", // extract only audio
         audioQuality: "0", // 0 = best
         output: `./tmp/${sessionId}/${name} -${artist}.webm`,
+        extra: ["--cookies", path.join(process.cwd(), "tmp/cookies.txt")],
+        "user-agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
       },
       { useGlobalBinary: true }
     );

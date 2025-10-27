@@ -11,6 +11,8 @@ require("dotenv").config();
 console.log(process.env.PORT);
 const initializeCredentials = require("./util/initializeCredentials");
 initializeCredentials();
+const writeCookiesFromEnv = require("./util/setCookies");
+writeCookiesFromEnv();
 
 const app = express();
 const server = HTTP.createServer(app);
