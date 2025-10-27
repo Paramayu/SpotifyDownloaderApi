@@ -1,5 +1,4 @@
 const fs = require("fs");
-require("dotenv").config();
 const credentialsData = JSON.parse(process.env.CREDENTIALS);
 const tokenData = JSON.parse(process.env.TOKEN);
 
